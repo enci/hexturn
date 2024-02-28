@@ -49,7 +49,7 @@ class Gameplay {
         }
         __gameGrid = HexGrid.new(__hexSize, __gridSize)
         __distGrid = HexGrid.new(__hexSize, __gridSize)
-        __triangle = GridSprite.new("[game]/assets/images/triangle.png", 6, 1)
+        __triangle = GridSprite.new("[game]/assets/images/generated/triangle.png", 6, 1)
         __player = Create.player() 
         System.print("Player created" + __player.toString)       
         __obstacles = Create.obstacles()

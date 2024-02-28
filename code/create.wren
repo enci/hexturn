@@ -43,7 +43,7 @@ class Create {
         var e = Entity.new()
         var t = Transform.new(grid.getPosition(hex))
         var h = HexTileComponent.new(hex, grid)
-        var s = Sprite.new("[game]/assets/images/filled_hexagon.png")
+        var s = Sprite.new("[game]/assets/images/generated/filled_hexagon.png")
         s.layer = 1
         s.flags = Render.spriteCenter
         s.mul = Data.getColor("Color Obstacle")
@@ -69,7 +69,7 @@ class Create {
         var gs = Gameplay.grid.gridSize
         var h = HexTileComponent.new(HexCoordinate.new(0, gs-1), Gameplay.grid)
         var p = Player.new()
-        var s = AnimatedSprite.new("[game]/assets/images/player.png", 60, 1, 60)
+        var s = AnimatedSprite.new("[game]/assets/images/generated/player.png", 60, 1, 60)
         var anim = Tools.rangeToList(0..59) + Tools.rangeToList(59..0)
         s.addAnimation("idle", anim)
         s.playAnimation("idle")
@@ -149,29 +149,29 @@ class Create {
         var fps = 60
         var anim = Tools.rangeToList(0..frames-1)
         if(type == EnemyType.basic) {
-            s = AnimatedSprite.new("[game]/assets/images/basic.png", frames, 1, fps / 2)
+            s = AnimatedSprite.new("[game]/assets/images/generated/basic.png", frames, 1, fps / 2)
             s.addAnimation("idle", anim)
             s.playAnimation("idle")
             s.mul = Data.getColor("Color Enemy Basic")
         } else if(type == EnemyType.range) {
-            s = AnimatedSprite.new("[game]/assets/images/range.png", frames, 1, fps)
+            s = AnimatedSprite.new("[game]/assets/images/generated/range.png", frames, 1, fps)
             s.addAnimation("idle", anim)
             s.playAnimation("idle")
             s.mul = Data.getColor("Color Enemy Range")
         } else if(type == EnemyType.stealth) {
-            s = AnimatedSprite.new("[game]/assets/images/stealth.png", frames, 1, fps / 2)
+            s = AnimatedSprite.new("[game]/assets/images/generated/stealth.png", frames, 1, fps / 2)
             s.addAnimation("idle", anim)
             s.playAnimation("idle")
             s.mul = Data.getColor("Color Enemy Stealth")
             var st = Stealth.new()
             e.addComponent(st)
         } else if(type == EnemyType.explode) {
-            s = AnimatedSprite.new("[game]/assets/images/explode.png", frames, 1, fps)
+            s = AnimatedSprite.new("[game]/assets/images/generated/explode.png", frames, 1, fps)
             s.addAnimation("explode", anim)
             s.playAnimation("explode")
             s.mul = Data.getColor("Color Enemy Explode")            
         } else if(type == EnemyType.split) {
-            s = AnimatedSprite.new("[game]/assets/images/basic.png", frames, 1, fps)
+            s = AnimatedSprite.new("[game]/assets/images/generated/basic.png", frames, 1, fps)
             s.mul = Data.getColor("Color Enemy Split")
         }
 
@@ -190,7 +190,7 @@ class Create {
     static explosion(hex, color) {
         var e = Entity.new()
         var t = Transform.new(Gameplay.grid.getPosition(hex))
-        var s = AnimatedSprite.new("[game]/assets/images/explosion.png", 16, 1, 60)
+        var s = AnimatedSprite.new("[game]/assets/images/generated/explosion.png", 16, 1, 60)
         s.addAnimation("explode", Tools.rangeToList(0..15))
         s.playAnimation("explode")
         s.layer = 1
@@ -208,7 +208,7 @@ class Create {
         {
             var e = Entity.new()
             var t = Transform.new(Vec2.new(0, 0))
-            var s = Sprite.new("[game]/assets/images/big_bar.png")
+            var s = Sprite.new("[game]/assets/images/generated/big_bar.png")
             s.layer = 1
             s.flags = Render.spriteCenter
             s.mul = Data.getColor("Color UI")
@@ -237,7 +237,7 @@ class Create {
         {
             var e = Entity.new()
             var t = Transform.new(Vec2.new(0, 0))
-            var s = Sprite.new("[game]/assets/images/big_bar.png")
+            var s = Sprite.new("[game]/assets/images/generated/big_bar.png")
             s.layer = 1
             s.flags = Render.spriteCenter
             s.mul = Data.getColor("Color UI")
@@ -271,7 +271,7 @@ class Create {
         { // Background
             var e = Entity.new()
             var t = Transform.new(Vec2.new(0, 0))
-            var s = Sprite.new("[game]/assets/images/white.png")
+            var s = Sprite.new("[game]/assets/images/generated/white.png")
             s.layer = -1.1
             s.scale = 320
             s.flags = Render.spriteCenter
@@ -283,7 +283,7 @@ class Create {
         { // Vignete
             var e = Entity.new()
             var t = Transform.new(Vec2.new(0, 0))
-            var s = Sprite.new("[game]/assets/images/vignete.png")
+            var s = Sprite.new("[game]/assets/images/generated/vignete.png")
             s.layer = 1.0
             s.scale = 2
             s.flags = Render.spriteCenter
@@ -321,7 +321,7 @@ class Create {
     static pingLabel(pos) {
         var e = Entity.new()
         var t = Transform.new(pos)
-        var l = PingLabel.new("[game]/assets/fonts/GravityBold8.ttf", " ", 16, 16, 0.2)
+        var l = PingLabel.new("[game]/assets/fonts/GravityBold8.ttf", " ", 40, 40, 0.2)
         l.layer = 2.1
         l.flags = Render.spriteCenter
         l.mul = Data.getColor("Color Player")

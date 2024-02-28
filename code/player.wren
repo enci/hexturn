@@ -21,13 +21,13 @@ class Player is Component {
         _transform = owner.getComponent(Transform)
         _hexTile = owner.getComponent(HexTileComponent)
 
-        var rangeImg = Render.loadImage("[game]/assets/images/small_hexagon.png")
+        var rangeImg = Render.loadImage("[game]/assets/images/generated/small_hexagon.png")
         _rangeSprite = Render.createSprite(rangeImg, 0, 0, 1, 1)
 
-        var thickImg = Render.loadImage("[game]/assets/images/thick_small_hexagon.png")
+        var thickImg = Render.loadImage("[game]/assets/images/generated/thick_small_hexagon.png")
         _thickSprite = Render.createSprite(thickImg, 0, 0, 1, 1)
 
-        var directionImg = Render.loadImage("[game]/assets/images/direction_indicator.png")
+        var directionImg = Render.loadImage("[game]/assets/images/generated/direction_indicator.png")
         _directionSprite = GridSprite.new(directionImg, 7, 1)   
 
         if(Gameplay.level >= Data.getNumber("Level Extra Range")) {

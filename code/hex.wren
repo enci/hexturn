@@ -20,6 +20,11 @@ class HexCoordinate {
         _r = hex.r
     }
 
+    construct fromOffset(col, row) {
+        _q = col
+        _r = row - (col - (col & 1)) / 2
+    }
+
     q=(value) { _q = value }
     q { _q }
     r=(value) { _r = value }

@@ -19,10 +19,10 @@ class Game {
         Gameplay.init()            
         Create.background()        
         
-        var image = Render.loadImage("[game]/assets/images/hexagon.png")
+        var image = Render.loadImage("[game]/assets/images/generated/hexagon.png")
         __sprite = Render.createSprite(image, 0, 0, 1, 1)
 
-        image = Render.loadImage("[game]/assets/images/filled_hexagon.png")
+        image = Render.loadImage("[game]/assets/images/generated/filled_hexagon.png")
         __filledSprite = Render.createSprite(image, 0, 0, 1, 1)
 
         __time = 0.0
@@ -43,16 +43,15 @@ class Game {
         var inactiveColor = Data.getColor("Color Inactive Tile")
 
         var origin = HexCoordinate.new(0, 0)
-        var r = 9
-        for (x in -r..r) {
-            for(y in -r..r) {                
-                var tile = HexCoordinate.new(x, y)                
+        for (x in -9..9) {
+            for(y in -5..4) {
+                var tile = HexCoordinate.fromOffset(x, y)
                 var pos = tile.getPosition(Gameplay.hexSize)
                 if(HexCoordinate.distance(tile, origin) < Gameplay.gridSize) {                    
                     Render.sprite(__sprite, pos.x, pos.y, 0.0, 1.0, 0.0, activeColor, 0x0, Render.spriteCenter)
                 } else {
                     var dist = HexCoordinate.distance(tile, origin)
-                    var size = Math.remap(Gameplay.gridSize, r, 1.0, 0.2, dist)
+                    var size = Math.remap(Gameplay.gridSize, 9.0, 1.0, 0.2, dist)
                     Render.sprite(__filledSprite, pos.x, pos.y, 0.0, size, 0.0, inactiveColor, 0x0, Render.spriteCenter)
                 }
             }
@@ -62,7 +61,7 @@ class Game {
             Gameplay.render()
         } 
 
-        Renderable.render()        
+        Renderable.render()
     }
     
     static update(dt) {

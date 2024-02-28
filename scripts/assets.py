@@ -3,46 +3,29 @@
 import cairo
 import random
 import math
-from scripts.tools import vec2, color
+from tools import vec2, color, next_power_of_2, lerp, lerp_vec2, remap
+from draw import rounded_hexagon, rounded_rectangle
 
 mul = 3
 g_size = 15
 eye_size = 5
 
-def draw_rounded_hexagon(radius : float, rounding : float, color : color, thickness : float, pos : vec2, context : cairo.Context):
-    if thickness != 0.0 :
-        context.set_line_width(thickness)
-
-    t = 0.0
-    dt = math.pi / 3.0
-    dtt = dt * 0.5
-    cx = pos.x
-    cy = pos.y
-    r = radius - rounding
-
-    # Draw the rounding
-    for i in range(0, 6):
-        x = math.cos(t) * r + cx
-        y = math.sin(t) * r + cy
-        context.arc(x, y, rounding, t - dtt, t + dtt)    
-        t += dt
-
-    context.set_source_rgba(color.r, color.g, color.b, color.a)
-    context.close_path()  
-    if thickness == 0.0:
-        context.fill()
-    else:
-        context.stroke()
-
-def rounded_hexagon(radius : float, rounding : float, color : color, thickness : float, file : str):
+def output_rounded_hexagon(radius : float, rounding : float, color : color, thickness : float, file : str):
     next_p2 = next_power_of_2(radius * 2 + 1)
     colorSurf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2, next_p2)
     colorCtx = cairo.Context(colorSurf)
-    draw_rounded_hexagon(radius, rounding, color, thickness, vec2(next_p2 * 0.5, next_p2 * 0.5), colorCtx)
+    rounded_hexagon(radius, rounding, color, thickness, vec2(next_p2 * 0.5, next_p2 * 0.5), colorCtx)
+    colorSurf.write_to_png("assets/images/generated/" + file + ".png")
+
+def output_rounded_rectangle(width: float, height: float, rounding: float, color: color, file: str):
+    next_p2 = next_power_of_2(width * 2 + 1)
+    colorSurf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2, next_p2)
+    colorCtx = cairo.Context(colorSurf)
+    rounded_rectangle(width, height, rounding, vec2(next_p2 * 0.5, next_p2 * 0.5), 0.0, colorCtx)
     colorSurf.write_to_png("assets/images/generated/" + file + ".png")
 
 # Draw six rounded triangles with a given radius and rounding in one image
-def rounded_triangles(radius, rounding, color, file):
+def output_rounded_triangles(radius, rounding, color, file):
     next_p2 = next_power_of_2(radius * 2 + 1)
     colorSurf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2 * 6, next_p2)
     colorCtx = cairo.Context(colorSurf)
@@ -67,21 +50,6 @@ def rounded_triangles(radius, rounding, color, file):
         colorCtx.close_path()  
         colorCtx.fill()  
     colorSurf.write_to_png("assets/images/generated/" + file + ".png")
-
-
-def rounded_rectangle(width: float, height: float, rounding: float, pos : vec2, rotation: float, context : cairo.Context):
-    matrix = cairo.Matrix()
-    matrix.translate(pos.x, pos.y)
-    matrix.rotate(rotation) 
-    context.set_matrix(matrix)
-    cx = -width * 0.5
-    cy = -height * 0.5        
-    context.arc(cx + width - rounding, cy + rounding, rounding, math.pi * 1.5, math.pi * 2.0)
-    context.arc(cx + width - rounding, cy + height - rounding, rounding, 0.0, math.pi * 0.5)
-    context.arc(cx + rounding, cy + height - rounding, rounding, math.pi * 0.5, math.pi)
-    context.arc(cx + rounding, cy + rounding, rounding, math.pi, math.pi * 1.5)
-    context.close_path()
-    context.fill()
 
 class particle :
     def __init__(self, pos : vec2, vel : vec2, color : color, size: float,  life : float) -> None:
@@ -173,7 +141,7 @@ def player():
     colorCtx.set_line_width(eye_size * mul)
 
     for i in range(0, frames):
-        draw_rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, colorCtx)
+        rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, colorCtx)
         pos.x += next_p2
 
     
@@ -194,19 +162,6 @@ def player():
         colorCtx.line_to(-radius * 0.3, -radius * 0.16 * blink)
         colorCtx.stroke()
 
-    # draw breathing circle
-        """
-    for i in range(0, frames):
-        t = (i / frames) 
-        t = math.pow(t, 1.0 / 4.0)
-        t *= math.pi * 0.5
-        t = math.sin(t)
-        colorCtx.set_source_rgba(0.0, 0.0, 0.0, 1.0)
-        colorCtx.arc(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5, radius * (0.2 + t * 0.3), 0.0, math.pi * 2.0)
-        colorCtx.set_line_width(2.0 * mul)
-        colorCtx.stroke()
-        """
-
     colorSurf.write_to_png("assets/images/generated/player.png")
 
 def basic():
@@ -221,37 +176,8 @@ def basic():
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
 
     for i in range(0, frames):
-        draw_rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
+        rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
         pos.x += next_p2
-
-    for i in range(0, frames):
-        t = (i / frames)
-        #t = 1.0 - math.pow(t, 1.0 / 4)
-        #sz = small_radius * t * 0.5 + small_radius * 0.5
-        #t *= math.pi * 0.5
-        # pos = vec2(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5)        
-        matrix = cairo.Matrix()
-        matrix.translate(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5)
-        context.set_matrix(matrix)
-        context.set_source_rgba(0.0, 0.0, 0.0, 1.0)
-
-        # draw mean eyes
-        y = -radius * 0.1        
-        sz = eye_size * mul * 0.5
-        if t < 0.45 and t > 0.05:
-            context.arc(radius * 0.4, y, sz, 0.0, math.pi * 2.0)
-            context.arc(-radius * 0.2, y, sz, 0.0, math.pi * 2.0)
-            context.fill()            
-        elif t > 0.55 and t < 0.95:
-            context.arc(-radius * 0.4, y, sz, 0.0, math.pi * 2.0)
-            context.arc(radius * 0.2, y, sz, 0.0, math.pi * 2.0)
-            context.fill()
-        else:
-            context.move_to(-radius * 0.4, y)
-            context.line_to(-radius * 0.2, y)
-            context.move_to(radius * 0.4, y)
-            context.line_to(radius * 0.2, y)
-            context.stroke()
 
     colorSurf.write_to_png("assets/images/generated/basic.png")
 
@@ -266,23 +192,9 @@ def stealth():
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
 
     for i in range(0, frames):
-        draw_rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
+        rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
         pos.x += next_p2
 
-    for i in range(0, frames):
-        t = (i / frames)        
-        matrix = cairo.Matrix()
-        matrix.translate(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5)
-        context.set_matrix(matrix)
-        context.set_source_rgba(0.0, 0.0, 0.0, 1.0)
-
-        blink = 1 if t < 0.9 else lerp(1.0, 0.0, (t - 0.9) * 10.0)
-        context.set_line_width(eye_size * mul * blink)
-        y = -radius * 0.1        
-        context.move_to(-radius * 0.65, y)
-        context.line_to(radius * 0.65, y)
-        context.stroke()        
-        
     colorSurf.write_to_png("assets/images/generated/stealth.png")
 
 def ranged():
@@ -295,29 +207,8 @@ def ranged():
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
 
     for i in range(0, frames):
-        draw_rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, colorCtx)
+        rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, colorCtx)
         pos.x += next_p2
-
-    # draw two circles rotating around each other
-    for i in range(0, frames):
-        t = (i / frames)
-        t = remap(0.75, 1.0, 0.0, 1.0, t)
-        t = math.pow(t, 4.0)
-        matrix = cairo.Matrix()
-        matrix.translate(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5 - radius * 0.1)
-        t = t * math.pi
-        sz = eye_size * mul * 0.5
-        # matrix.rotate(-t)
-        colorCtx.set_matrix(matrix)        
-        colorCtx.set_source_rgba(0.0, 0.0, 0.0, 1.0)
-        cx = math.cos(t) * (radius) * 0.3
-        cy = math.sin(t) * (radius) * 0.3
-        # colorCtx.arc(cx, cy, sz , 0.0, math.pi * 2.0)
-        colorCtx.arc(-cx, -cy, sz , 0.0, math.pi * 2.0)
-        cx = lerp(-radius * 0.3, radius * 0.3, t)   
-        cy = 0.0
-        colorCtx.arc(-cx, -cy, sz , 0.0, math.pi * 2.0)
-        colorCtx.fill()
         
     colorSurf.write_to_png("assets/images/generated/range.png")
 
@@ -332,57 +223,9 @@ def explode():
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
 
     for i in range(0, frames):
-        draw_rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
+        rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
         pos.x += next_p2
 
-
-    for i in range(0, frames):
-        t = (i / frames)
-        matrix = cairo.Matrix()
-        matrix.translate(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5)
-        context.set_matrix(matrix)
-        context.set_source_rgba(0.0, 0.0, 0.0, 1.0)        
-
-        y = -radius * 0.1     
-        sz = eye_size * mul * 0.5
-        context.arc(-radius * 0.3, y, sz, 0.0, math.pi * 2.0)
-        context.fill()
-        if t < 0.5:
-            context.arc(radius * 0.3, y, sz, 0.0, math.pi * 2.0)
-            context.fill()
-        else:   
-            y = -radius * 0.1 + math.sin(t * math.pi * 20) * radius * 0.08
-            context.move_to(radius * 0.45, y)
-            context.line_to(radius * 0.15, y)            
-            context.stroke()
-
-
-    """
-    # draw six lines
-    for i in range(0, frames):
-        t = (i / frames)
-        t0 = math.pow(t, 1.0)
-        t1 = math.pow(t, 1.0 / 4)
-        t0 = t0 * 0.6 + 0.2
-        t1 = t1 * 0.8
-        matrix = cairo.Matrix()
-        matrix.translate(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5)                    
-        colorCtx.set_matrix(matrix)
-        for j in range(0, 6):
-            theta = j * math.pi / 3.0 + math.pi / 6.0
-
-            x0 = math.cos(theta) * radius * t0
-            y0 = math.sin(theta) * radius * t0
-            x1 = math.cos(theta) * radius * t1
-            y1 = math.sin(theta) * radius * t1
-
-            colorCtx.move_to(x0, y0)
-            colorCtx.line_to(x1, y1)
-            colorCtx.set_source_rgba(0.0, 0.0, 0.0, 1.0)
-            colorCtx.set_line_width(2.0 * mul)
-            colorCtx.stroke()
-    """
-            
     colorSurf.write_to_png("assets/images/generated/explode.png")
 
 
@@ -394,20 +237,20 @@ def main():
     ranged()
     explode()
 
-    rounded_hexagon(19 * mul, 4 * mul, white, 1.0  * mul, "hexagon")
-    rounded_hexagon(19 * mul, 4 * mul, white, 1.0  * mul, "small_hexagon")
-    rounded_hexagon(19 * mul, 3 * mul, white, 1.6 * mul, "thick_small_hexagon")
+    output_rounded_hexagon(19 * mul, 4 * mul, white, 1.0  * mul, "hexagon")
+    output_rounded_hexagon(19 * mul, 4 * mul, white, 1.0  * mul, "small_hexagon")
+    output_rounded_hexagon(19 * mul, 3 * mul, white, 1.6 * mul, "thick_small_hexagon")
     
-    #rounded_hexagon(14 * mul, 3 * mul, white, 0.0, "filled_hexagon")
-    #rounded_hexagon(8 * mul, 3 * mul, white, 0.0, "small_filled_hexagon")
-    #hexagon_progress_arc(5 * mul, white, "direction_indicator")
+    output_rounded_hexagon(14 * mul, 3 * mul, white, 0.0, "filled_hexagon")
+    output_rounded_hexagon(8 * mul, 3 * mul, white, 0.0, "small_filled_hexagon")
+    hexagon_progress_arc(5 * mul, white, "direction_indicator")
     #hexagon_progress_arc(8 * mul, white, "powerup")
     #rounded_hexagon(12 * mul, 4 * mul, white, 0.0, "pawn")
     
-    rounded_triangles(3 * mul, 1 * mul, white, "triangle")
-    rounded_rectangle(624 * mul, 16 * mul, 1 * mul, white, "bar")
-    rounded_rectangle(624 * mul, 120 * mul, 1 * mul, white, "big_bar")
-    rounded_rectangle(70 * mul, 16 * mul, 1 * mul, white, "menu_bg_bar")
+    output_rounded_triangles(3 * mul, 1 * mul, white, "triangle")
+    output_rounded_rectangle(624 * mul, 16 * mul, 1 * mul, white, "bar")
+    output_rounded_rectangle(624 * mul, 120 * mul, 1 * mul, white, "big_bar")
+    output_rounded_rectangle(70 * mul, 16 * mul, 1 * mul, white, "menu_bg_bar")
     explosion(16, 16, white, "explosion")
 
 # run the main function

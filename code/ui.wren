@@ -6,7 +6,7 @@ import "xs_components" for Transform, Body, Renderable, Sprite, GridSprite, Anim
 class PingLabel is Sprite {
     construct new(font, text, size0, size1, time) {
         super()
-        _font = Render.loadFont("[game]/assets/fonts/GravityBold8.ttf", size0)
+        _font = Render.loadFont("[game]/assets/fonts/cyberspace.ttf", size0)
         _text = text
         _time = time
         _timer = 0.0
@@ -18,7 +18,7 @@ class PingLabel is Sprite {
         flags = Render.spriteOverlay
 
         // Create child bar under the label
-        var bar = Render.loadImage("[game]/assets/images/menu_bg_bar.png")
+        var bar = Render.loadImage("[game]/assets/images/generated/menu_bg_bar.png")
         _bg = Render.createSprite(bar, 0, 0, 1, 1)
     }
 
@@ -56,7 +56,7 @@ class ImGuiRenderItem_ {
         _x = x
         _y = y
         _selected = selected
-        var bar = Render.loadImage("[game]/assets/images/menu_bg_bar.png")
+        var bar = Render.loadImage("[game]/assets/images/generated/menu_bg_bar.png")
         _bg = Render.createSprite(bar, 0, 0, 1, 1)
     }
 
@@ -80,7 +80,7 @@ class ImGui is Renderable {
         _active = 0
         _guard = 0
         _count = 0
-        _font = Render.loadFont("[game]/assets/fonts/GravityBold8.ttf", size)
+        _font = Render.loadFont("[game]/assets/fonts/cyberspace.ttf", size)
     }
 
     begin() { 
@@ -217,9 +217,9 @@ class MainMenu is Component {
 
 class UI {
     static init() {
-        var x = -580.0
-        var y = 300.0
-        var dy = 25.0      
+        var x = -780.0
+        var y = 400.0
+        var dy = 45.0
         var score = Create.pingLabel(Vec2.new(x, y))
         __score = score.getComponent(PingLabel)
         y = y - dy
@@ -246,10 +246,10 @@ class UI {
         for(i in 0...player.range) {
             rangeBars = rangeBars + "|"
         }
-        __score.text = "Sc " + Gameplay.score.toString
-        __multiplier.text = "ML " + player.multiplier.toString
-        __range.text = "Rn " + rangeBars
-        __level.text = "Lv " + (Gameplay.level + 1).toString
+        __score.text = "SCORE " + Gameplay.score.toString
+        __multiplier.text = "MULT " + player.multiplier.toString
+        __range.text = "RANGE " + rangeBars
+        __level.text = "LEVEL " + (Gameplay.level + 1).toString
     }
 
     static render() {}
