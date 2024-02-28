@@ -32,38 +32,11 @@ class Game {
         __random = Random.new()
         __shakeOffset = Vec2.new(0, 0)
         __shakeIntesity = 0
+
+        __beat = 0.0
     }
 
     static config() { }
-
-    static render() {
-        Render.setOffset(__shakeOffset.x * __shakeIntesity, __shakeOffset.y * __shakeIntesity)
-
-        var activeColor = Data.getColor("Color Active Tile")
-        var inactiveColor = Data.getColor("Color Inactive Tile")
-
-        var origin = HexCoordinate.new(0, 0)
-        for (x in -9..9) {
-            for(y in -5..4) {
-                var tile = HexCoordinate.fromOffset(x, y)
-                var pos = tile.getPosition(Gameplay.hexSize)
-                if(HexCoordinate.distance(tile, origin) < Gameplay.gridSize) {                    
-                    Render.sprite(__sprite, pos.x, pos.y, 0.0, 1.0, 0.0, activeColor, 0x0, Render.spriteCenter)
-                } else {
-                    var dist = HexCoordinate.distance(tile, origin)
-                    var size = Math.remap(Gameplay.gridSize, 9.0, 1.0, 0.2, dist)
-                    Render.sprite(__filledSprite, pos.x, pos.y, 0.0, size, 0.0, inactiveColor, 0x0, Render.spriteCenter)
-                }
-            }
-        }
-        
-
-        if(__state == GameState.game) {
-            Gameplay.render()
-        } 
-
-        Renderable.render()
-    }
     
     static update(dt) {
         Entity.update(dt)
@@ -102,6 +75,42 @@ class Game {
         if(__shakeIntesity < 0.1) {
             __shakeIntesity = 0
         }
+
+        __beat = __beat + dt
+        if(__beat > 1.0) __beat = 0.0
+    }
+
+    static render() {
+        Render.setOffset(__shakeOffset.x * __shakeIntesity, __shakeOffset.y * __shakeIntesity)
+
+        var activeColor = Data.getColor("Color Active Tile")
+        var inactiveColor = Data.getColor("Color Inactive Tile")
+
+        var beat = 1.0 - __beat
+        beat = beat.pow(2.0)
+        var beatSize = Math.remap(0.0, 1.0, 0.9, 1.2, beat)
+        
+        var origin = HexCoordinate.new(0, 0)
+        for (x in -9..9) {
+            for(y in -5..4) {
+                var tile = HexCoordinate.fromOffset(x, y)
+                var pos = tile.getPosition(Gameplay.hexSize)
+                if(HexCoordinate.distance(tile, origin) < Gameplay.gridSize) {                    
+                    Render.sprite(__sprite, pos.x, pos.y, 0.0, 1.0, 0.0, activeColor, 0x0, Render.spriteCenter)
+                } else {
+                    var dist = HexCoordinate.distance(tile, origin)
+                    var size = Math.remap(Gameplay.gridSize, 9.0, 1.0, 0.2, dist) * beatSize
+                    Render.sprite(__filledSprite, pos.x, pos.y, 0.0, size, 0.0, inactiveColor, 0x0, Render.spriteCenter)
+                }
+            }
+        }
+        
+
+        if(__state == GameState.game) {
+            Gameplay.render()
+        } 
+
+        Renderable.render()
     }
 
     static setState(state) {

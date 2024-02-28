@@ -1,4 +1,4 @@
-import "xs" for Input, Render, Data
+import "xs" for Input, Render, Data, Profiler
 import "xs_math" for Vec2, Color, Math, Bits
 import "xs_ec"for Entity, Component
 import "xs_components" for Renderable, Transform, GridSprite
@@ -69,8 +69,9 @@ class Gameplay {
     }
 
     static updateDist() {
-        // Fresh grid
-        __distGrid = HexGrid.new(__gameGrid.hexSize, __gameGrid.gridSize)
+        Profiler.begin("updateDist")
+        
+        __distGrid.clear()
 
         if(__player.deleted) {
             return
@@ -102,7 +103,8 @@ class Gameplay {
 
         // Get all the dangerous tiles
         var enemies = Entity.withTagOverlap(Tag.enemy)
-        __dangerTiles = Map.new()
+        __dangerTiles.clear()
+
         for(e in enemies) {
             var htc = e.getComponent(HexTileComponent)
             var tile = htc.tile
@@ -122,6 +124,8 @@ class Gameplay {
                 __bestDirection.setTileAt(hex, best)
             }
         }
+
+        Profiler.end("updateDist")
     }
 
     static update(dt) {
@@ -150,8 +154,7 @@ class Gameplay {
                 var enemyComponent = enemy.getComponent(Enemy)
                 if(!enemyComponent.turn(dt)) {
                     done = false
-                }
-                updateDist()
+                } 
             }                   
             if(done) {
                 __state = State.player
@@ -208,24 +211,6 @@ class Gameplay {
     }
 
     static render() {       
-
-        /*
-        // Get all the dangerous tiles
-        var enemies = Entity.withTagOverlap(Tag.enemy)
-        var tiles = Map.new()
-        for(e in enemies) {
-            var htc = e.getComponent(HexTileComponent)
-            var tile = htc.tile
-            var ec = e.getComponent(Enemy)
-            var neighbors = __gameGrid.getFreeHexesInRange(tile, ec.maxRange)
-            for(n in neighbors) {
-                tiles[n.hash] = n    
-            }
-        }
-        */
-
-        
-
         var dangerColor = Data.getColor("Color Enemy")        
         var normalColor = Data.getColor("Color Active Tile")                
         var n = __gameGrid.gridSize - 1

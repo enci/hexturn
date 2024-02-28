@@ -120,11 +120,8 @@ class Player is Component {
     range { _range }
     multiplier { _multiplier }
 
-    render() {
-    
+    render() {    
         var inRange = Gameplay.grid.getHexesInRange(_hexTile.tile, _range)
-        
-        /*
         for(hex in inRange) {
             var pos = Gameplay.grid.getPosition(hex)
             var dist = Gameplay.distGrid.getTileAt(hex)
@@ -144,7 +141,6 @@ class Player is Component {
                 Render.sprite(_rangeSprite, pos.x, pos.y, 0.0, 1.0, 0.0, color, 0x0, Render.spriteCenter)
             }
         }
-        */
 
         var color = Data.getColor("Color Player")
         if(_canMove && _moveDir.magnitude > _deadzone && _range > 0) {

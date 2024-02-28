@@ -232,13 +232,12 @@ class HexGrid {
 
     getHexesInRange(hex, range) {
         var hexes = []
-        for(x in -range..range) {
-            for(y in -range..range) {
-                for(z in -range..range) {
-                    var h = HexCoordinate.new(x, y, z) + hex
-                    if(HexCoordinate.distance(hex, h) <= range && isValid(h)) {
-                        hexes.add(h)
-                    }
+        var n = range
+        for (x in -n..n) {
+            for(y in (-n).max(-x-n)..n.min(-x+n)) {
+                var h = HexCoordinate.new(x, y) + hex
+                if(isValid(h)) {
+                    hexes.add(h)
                 }
             }
         }
@@ -247,13 +246,12 @@ class HexGrid {
 
     getFreeHexesInRange(hex, range) {
         var hexes = []
-        for(x in -range..range) {
-            for(y in -range..range) {
-                for(z in -range..range) {
-                    var h = HexCoordinate.new(x, y, z) + hex
-                    if(HexCoordinate.distance(hex, h) <= range && isValid(h) && getTileAt(h) == null) {
-                        hexes.add(h)
-                    }
+        var n = range
+        for (x in -n..n) {
+            for(y in (-n).max(-x-n)..n.min(-x+n)) {
+                var h = HexCoordinate.new(x, y) + hex
+                if(isValid(h) && getTileAt(h) == null) {
+                    hexes.add(h)
                 }
             }
         }
@@ -283,19 +281,14 @@ class HexGrid {
             }
         }
     }
-    
 
-    /*
-    getHexAt(position) {
-        var tile = getHex(position)
-        return _grid.get(tile.x + _size, tile.y + _size)
+    clear() {
+        for(x in 0..._grid.width) {
+            for(y in 0..._grid.height) {
+                _grid[x, y] = null
+            }
+        }
     }
-
-    setTileAt(position, tile) {
-        var tile = getHex(position)
-        _grid.set(tile.x + _size, tile.y + _size, tile)
-    }
-    */
 }
 
 import "code/data" for Grid
