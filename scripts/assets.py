@@ -115,7 +115,7 @@ def explosion(radius: float, frames: int, color: color, file: str):
     for i in range(0, num_particles):
         pos = random_on_hexagon(radius)
         vel = pos.normalized() * random.uniform(10.0, 20.0)
-        particles.append(particle(pos, vel, color, random.uniform(4.0, 8.0), random.uniform(0.5, 1.0)))
+        particles.append(particle(pos, vel, color, random.uniform(4.0 * mul, 8.0 * mul), random.uniform(0.5, 1.0)))
     
     for i in range(0, frames):        
         center = vec2(next_p2 * i + next_p2 * 0.5, next_p2 * 0.5)
@@ -166,7 +166,7 @@ def player():
 
 def basic():
     radius = g_size * mul
-    small_radius = 8 * mul
+    small_radius = 6 * mul
     next_p2 = next_power_of_2(radius * 2 + 1)
     frames = 60
     colorSurf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2 * frames, next_p2)
@@ -174,9 +174,13 @@ def basic():
     context.set_line_cap(cairo.LINE_CAP_ROUND)
     context.set_line_width(2.5 * mul)
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
-
     for i in range(0, frames):
         rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
+        pos.x += next_p2
+
+    pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
+    for i in range(0, frames):
+        rounded_hexagon(small_radius, 3.0 * mul , color(0.0, 0.0, 0.0, 1.0), 0.0, pos, context)
         pos.x += next_p2
 
     colorSurf.write_to_png("assets/images/generated/basic.png")
@@ -190,24 +194,41 @@ def stealth():
     context = cairo.Context(colorSurf)
     context.set_line_cap(cairo.LINE_CAP_ROUND)    
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
-
     for i in range(0, frames):
         rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
+        pos.x += next_p2
+
+    pos = vec2(next_p2 * 0.5, next_p2 * 0.5)    
+    for i in range(0, frames):
+        # draw a black line through the hexagon
+        context.set_line_width(5.5 * mul)
+        context.set_source_rgba(0.0, 0.0, 0.0, 1.0)
+        context.move_to(pos.x - small_radius, pos.y)
+        context.line_to(pos.x + small_radius, pos.y)
+        context.stroke()
         pos.x += next_p2
 
     colorSurf.write_to_png("assets/images/generated/stealth.png")
 
 def ranged():
     radius = g_size * mul
-    small_radius = 2 * mul
+    small_radius = 1.6 * mul
     next_p2 = next_power_of_2(radius * 2 + 1)
     frames = 60
     colorSurf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2 * frames, next_p2)
     colorCtx = cairo.Context(colorSurf)
     pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
 
-    for i in range(0, frames):
+    for i in range(0, frames):        
         rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, colorCtx)
+        rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, colorCtx)
+        pos.x += next_p2
+
+    pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
+    for i in range(0, frames):
+        offset = vec2(5.0, 2.0) * mul
+        rounded_hexagon(small_radius * mul, 3.0 * mul , color(0.0, 0.0, 0.0, 1.0), 0.0, pos + offset, colorCtx)
+        rounded_hexagon(small_radius * mul, 3.0 * mul , color(0.0, 0.0, 0.0, 1.0), 0.0, pos - offset, colorCtx)
         pos.x += next_p2
         
     colorSurf.write_to_png("assets/images/generated/range.png")
@@ -224,6 +245,18 @@ def explode():
 
     for i in range(0, frames):
         rounded_hexagon(radius, 3.0 * mul , color(1.0, 1.0, 1.0, 1.0), 0.0, pos, context)
+        pos.x += next_p2
+
+    pos = vec2(next_p2 * 0.5, next_p2 * 0.5)
+    for i in range(0, frames):
+        for j in range(0, 6):
+            t = -j * math.pi / 3.0
+            dt = math.pi / 3.0
+            r = radius * 0.5
+            x = math.cos(t) * r
+            y = math.sin(t) * r
+            p = vec2(x, y)
+            rounded_hexagon(2.0 * mul , 3.0 * mul , color(0.0, 0.0, 0.0, 1.0), 0.0, pos + p, context)
         pos.x += next_p2
 
     colorSurf.write_to_png("assets/images/generated/explode.png")
@@ -251,7 +284,7 @@ def main():
     output_rounded_rectangle(624 * mul, 16 * mul, 1 * mul, white, "bar")
     output_rounded_rectangle(624 * mul, 120 * mul, 1 * mul, white, "big_bar")
     output_rounded_rectangle(70 * mul, 16 * mul, 1 * mul, white, "menu_bg_bar")
-    explosion(16, 16, white, "explosion")
+    explosion(16 * mul, 16, white, "explosion")
 
 # run the main function
 main()

@@ -17,19 +17,19 @@
     },
     "Color Enemy Explode": {
         "type": "color",
-        "value": 4278216447
+        "value": 4278190335
     },
     "Color Enemy Range": {
         "type": "color",
-        "value": 4278237439
+        "value": 4278190335
     },
     "Color Enemy Stealth": {
         "type": "color",
-        "value": 3288399871
+        "value": 4278190335
     },
     "Color Inactive Tile": {
         "type": "color",
-        "value": 184948991
+        "value": 235809535
     },
     "Color Obstacle": {
         "type": "color",
@@ -77,6 +77,6 @@
     },
     "Shake Explosion": {
         "type": "number",
-        "value": 0.6000000238418579
+        "value": 2.5999999046325684
     }
 }

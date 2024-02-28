@@ -220,7 +220,7 @@ class Create {
         {
             var e = Entity.new()
             var t = Transform.new(Vec2.new(0, 0))
-            var l = Label.new("[game]/assets/fonts/GravityBold8.ttf", "SCORE: " + score.toString, 32)
+            var l = Label.new("[game]/assets/fonts/cyberspace.ttf", "SCORE: " + score.toString, 32)
             var r = Relation.new(screen)
             l.layer = 1.1
             l.flags = Render.spriteCenter
@@ -249,7 +249,7 @@ class Create {
         {
             var e = Entity.new()
             var t = Transform.new(Vec2.new(0, 0))
-            var l = Label.new("[game]/assets/fonts/GravityBold8.ttf", "Level " + (Gameplay.level + 2).toString, 32)
+            var l = Label.new("[game]/assets/fonts/cyberspace.ttf", "Level " + (Gameplay.level + 2).toString, 32)
             var r = Relation.new(screen)
             l.layer = 1.1
             l.flags = Render.spriteCenter
@@ -294,7 +294,7 @@ class Create {
         {   // Bottom label
             var e = Entity.new()
             var t = Transform.new(Vec2.new(700, -h + 16))
-            var l = Label.new("[game]/assets/fonts/GravityBold8.ttf", "hexturn v" + Game.version.toString, 16)
+            var l = Label.new("[game]/assets/fonts/cyberspace.ttf", "hexturn v" + Game.version.toString, 16)
             l.layer = -1.0
             l.flags = Render.spriteCenter
             l.mul = Data.getColor("Color UI")
@@ -321,7 +321,7 @@ class Create {
     static pingLabel(pos) {
         var e = Entity.new()
         var t = Transform.new(pos)
-        var l = PingLabel.new("[game]/assets/fonts/GravityBold8.ttf", " ", 40, 40, 0.2)
+        var l = PingLabel.new("[game]/assets/fonts/cyberspace.ttf", " ", 40, 40, 0.2)
         l.layer = 2.1
         l.flags = Render.spriteCenter
         l.mul = Data.getColor("Color Player")
