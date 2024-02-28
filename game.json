@@ -1,0 +1,82 @@
+{
+    "Color Active Tile": {
+        "type": "color",
+        "value": 842294527
+    },
+    "Color Background": {
+        "type": "color",
+        "value": 538253311
+    },
+    "Color Enemy": {
+        "type": "color",
+        "value": 4278190335
+    },
+    "Color Enemy Basic": {
+        "type": "color",
+        "value": 4278190335
+    },
+    "Color Enemy Explode": {
+        "type": "color",
+        "value": 4278216447
+    },
+    "Color Enemy Range": {
+        "type": "color",
+        "value": 4278237439
+    },
+    "Color Enemy Stealth": {
+        "type": "color",
+        "value": 3288399871
+    },
+    "Color Inactive Tile": {
+        "type": "color",
+        "value": 184948991
+    },
+    "Color Obstacle": {
+        "type": "color",
+        "value": 1042957823
+    },
+    "Color Player": {
+        "type": "color",
+        "value": 298713087
+    },
+    "Color Player Far": {
+        "type": "color",
+        "value": 163490559
+    },
+    "Color Player Farther": {
+        "type": "color",
+        "value": 41501695
+    },
+    "Color UI": {
+        "type": "color",
+        "value": 842294527
+    },
+    "Color UI Selected": {
+        "type": "color",
+        "value": 2818589951
+    },
+    "Debug Distance": {
+        "type": "bool",
+        "value": false
+    },
+    "Level Advanced Enemies": {
+        "type": "number",
+        "value": 4.0
+    },
+    "Level Enlarge Grid": {
+        "type": "number",
+        "value": 9.0
+    },
+    "Level Extra Range": {
+        "type": "number",
+        "value": 6.0
+    },
+    "Print entities": {
+        "type": "bool",
+        "value": false
+    },
+    "Shake Explosion": {
+        "type": "number",
+        "value": 0.6000000238418579
+    }
+}
