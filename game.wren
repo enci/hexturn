@@ -56,6 +56,7 @@ class Game {
                 }
             }
         }
+        
 
         if(__state == GameState.game) {
             Gameplay.render()

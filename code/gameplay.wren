@@ -48,7 +48,10 @@ class Gameplay {
             __gridSize = 5
         }
         __gameGrid = HexGrid.new(__hexSize, __gridSize)
-        __distGrid = HexGrid.new(__hexSize, __gridSize)
+        __distGrid = HexGrid.new(__hexSize, __gridSize)        
+        __bestDirection = HexGrid.new(__hexSize, __gridSize)
+        __dangerTiles = Map.new()
+
         __triangle = GridSprite.new("[game]/assets/images/generated/triangle.png", 6, 1)
         __player = Create.player() 
         System.print("Player created" + __player.toString)       
@@ -97,6 +100,28 @@ class Gameplay {
             }
         }
 
+        // Get all the dangerous tiles
+        var enemies = Entity.withTagOverlap(Tag.enemy)
+        __dangerTiles = Map.new()
+        for(e in enemies) {
+            var htc = e.getComponent(HexTileComponent)
+            var tile = htc.tile
+            var ec = e.getComponent(Enemy)
+            var neighbors = __gameGrid.getFreeHexesInRange(tile, ec.maxRange)
+            for(n in neighbors) {
+                __dangerTiles[n.hash] = n
+            }
+        }
+
+        // Get the best direction for each tile
+        var n = __gameGrid.gridSize - 1
+        for (x in -n..n) {
+            for(y in (-n).max(-x-n)..n.min(-x+n)) {
+                var hex = HexCoordinate.new(x, y)
+                var best = Gameplay.getBestDirection(hex)
+                __bestDirection.setTileAt(hex, best)
+            }
+        }
     }
 
     static update(dt) {
@@ -182,8 +207,9 @@ class Gameplay {
         return best
     }
 
-    static render() {
+    static render() {       
 
+        /*
         // Get all the dangerous tiles
         var enemies = Entity.withTagOverlap(Tag.enemy)
         var tiles = Map.new()
@@ -196,48 +222,37 @@ class Gameplay {
                 tiles[n.hash] = n    
             }
         }
+        */
+
+        
 
         var dangerColor = Data.getColor("Color Enemy")        
-        var normalColor = Data.getColor("Color Active Tile")        
-        var n = 6
-        var origin = HexCoordinate.new(0, 0)
+        var normalColor = Data.getColor("Color Active Tile")                
+        var n = __gameGrid.gridSize - 1
         for (x in -n..n) {
-            for(y in -n..n) {                
+            for(y in (-n).max(-x-n)..n.min(-x+n)) {
                 var hex = HexCoordinate.new(x, y)
-                if(HexCoordinate.distance(hex, origin) < __gameGrid.gridSize) {
-                    var pos = __gameGrid.getPosition(hex)
-                    var distance = __distGrid.getTileAt(hex)
+                var pos = __gameGrid.getPosition(hex)
+                var distance = __distGrid.getTileAt(hex)
 
-                    if(Data.getBool("Debug Distance")) {
-                        Render.setColor(0xFFFFFFFF)
-                        var text = distance.toString                    
-                        Render.shapeText(text, pos.x, pos.y, 1.0)
-                    }
-                    
-                    var best = Gameplay.getBestDirection(hex)
-                    var dist = __distGrid.getTileAt(hex)
-                    var tile = __gameGrid.getTileAt(hex)
-                    if (best != -1 && dist != null && tile == null) {
-                        var triangleSprite = __triangle[best]
-                        if(tiles.containsKey(hex.hash)) {
-                            Render.sprite(triangleSprite, pos.x, pos.y, 1.0, 1.0, 0.0, dangerColor, 0x0, Render.spriteCenter)
-                        } else {
-                            Render.sprite(triangleSprite, pos.x, pos.y, 1.0, 1.0, 0.0, normalColor, 0x0, Render.spriteCenter)
-                        }
+                if(Data.getBool("Debug Distance")) {
+                    Render.setColor(0xFFFFFFFF)
+                    var text = distance.toString                    
+                    Render.shapeText(text, pos.x, pos.y, 2.0)
+                }
+                
+                var best = __bestDirection.getTileAt(hex)
+                var dist = __distGrid.getTileAt(hex)              
+                if (best != -1 && dist != null) {
+                    var triangleSprite = __triangle[best]
+                    if(__dangerTiles.containsKey(hex.hash)) {
+                        Render.sprite(triangleSprite, pos.x, pos.y, 0.0, 1.0, 0.0, dangerColor, 0x0, Render.spriteCenter)
                     } else {
-                        if(tile != null) {
-                            var stealth = tile.owner.getComponent(Stealth)
-                            if(stealth != null && stealth.alpha <= 0.0) {                                
-                                    var rangeSprite = __triangle[0]
-                                    Render.sprite(rangeSprite, pos.x, pos.y, 1.0, 1.0, 0.0, dangerColor, 0x0, Render.spriteCenter)
-                            }
-                        }
-                    }                             
+                        Render.sprite(triangleSprite, pos.x, pos.y, 0.0, 1.0, 0.0, normalColor, 0x0, Render.spriteCenter)
+                    }
                 }
             }
         }
-
-        
 
         var player = __player.getComponent(Player)
         if(!__player.deleted && player.initialized_) {            
