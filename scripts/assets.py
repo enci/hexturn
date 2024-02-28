@@ -261,6 +261,48 @@ def explode():
 
     colorSurf.write_to_png("assets/images/generated/explode.png")
 
+class metaball:
+    def __init__(self, x : float, y : float, r : float) -> None:
+        self.x = x
+        self.y = y
+        self.r = r
+        self.r2 = r * r
+
+def evaluate_metaballs(balls, x, y):
+    sum = 0
+    for b in balls:
+        dx = x - b.x
+        dy = y - b.y
+        r2 = dx * dx + dy * dy
+        sum += b.r2 / r2
+    return sum
+
+def blobs():
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100, 100)
+    data = surf.get_data()
+
+    balls = []
+    for i in range(0, 10):
+        x = random.uniform(15, 85)
+        y = random.uniform(15, 85)
+        r = random.uniform(5, 10)
+        balls.append(metaball(x, y, r))
+    
+    for i in range(0, 100):
+        for j in range(0, 100):            
+            idx = (i * 100 + j) * 4
+            value = evaluate_metaballs(balls, i, j)
+            #c = int(remap(0.0, 10.0, 0.0, 255.0, value))
+            c = 255
+            if value > 1.0:
+                c = 0
+            data[idx] = c
+            data[idx + 1] = c
+            data[idx + 2] = c
+            data[idx + 3] = 255
+
+    surf.write_to_png("assets/images/generated/blob.png")
+
 
 def main():
     white = color(1.0, 1.0, 1.0)
@@ -287,4 +329,6 @@ def main():
     explosion(16 * mul, 16, white, "explosion")
 
 # run the main function
-main()
+# main()
+    
+blobs()
