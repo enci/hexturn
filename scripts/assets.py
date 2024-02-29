@@ -278,28 +278,31 @@ def evaluate_metaballs(balls, x, y):
     return sum
 
 def blobs():
-    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100, 100)
+    frames = 10
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100 * 10, 100)
     data = surf.get_data()
 
-    balls = []
-    for i in range(0, 10):
-        x = random.uniform(15, 85)
-        y = random.uniform(15, 85)
-        r = random.uniform(5, 10)
-        balls.append(metaball(x, y, r))
+    for f in range(0, 10):
+        balls = []
+        for i in range(0, 10):
+            x = random.uniform(15, 85)
+            y = random.uniform(15, 85)
+            r = random.uniform(5, 10)
+            balls.append(metaball(x, y, r))
     
-    for i in range(0, 100):
-        for j in range(0, 100):            
-            idx = (i * 100 + j) * 4
-            value = evaluate_metaballs(balls, i, j)
-            #c = int(remap(0.0, 10.0, 0.0, 255.0, value))
-            c = 255
-            if value > 1.0:
-                c = 0
-            data[idx] = c
-            data[idx + 1] = c
-            data[idx + 2] = c
-            data[idx + 3] = 255
+        for y in range(0, 100):
+            for x in range(0, 100):
+                i = x
+                j = y
+                idx = (x + f * 100 + y * 1000) * 4 
+                value = evaluate_metaballs(balls, x, y)
+                c = 255
+                if value > 1.0:
+                    c = 0
+                data[idx] = c
+                data[idx + 1] = c
+                data[idx + 2] = c
+                data[idx + 3] = 255
 
     surf.write_to_png("assets/images/generated/blob.png")
 
