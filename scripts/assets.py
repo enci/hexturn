@@ -5,10 +5,19 @@ import random
 import math
 from tools import vec2, color, next_power_of_2, lerp, lerp_vec2, remap
 from draw import rounded_hexagon, rounded_rectangle
+from perlin_noise import PerlinNoise
+import PIL.Image as Image
 
 mul = 3
 g_size = 15
 eye_size = 5
+
+def to_pil(surface):
+    return Image.frombuffer(
+        "ARGB",
+        (surface.get_width(), surface.get_height()),
+        surface.get_data(),
+        "raw", "ARGB", 0, 1)
 
 def output_rounded_hexagon(radius : float, rounding : float, color : color, thickness : float, file : str):
     next_p2 = next_power_of_2(radius * 2 + 1)
@@ -127,7 +136,6 @@ def explosion(radius: float, frames: int, color: color, file: str):
         # draw particles
         for p in particles:
             p.draw(colorCtx, center)
-
     colorSurf.write_to_png("assets/images/generated/" + file + ".png")
 
 def player():
@@ -268,49 +276,176 @@ class metaball:
         self.r = r
         self.r2 = r * r
 
+class noise_point:
+    def __init__(self) -> None:
+        self.cx0 = random.uniform(0, 1)
+        self.cy0 = random.uniform(0, 1)
+        self.cz0 = random.uniform(0, 1)
+        self.cx1 = random.uniform(0, 1)
+        self.cy1 = random.uniform(0, 1)
+        self.cz1 = random.uniform(0, 1)
+    
+    def noise(self, noise : PerlinNoise, t : float) -> vec2:
+        # sample periodic noise by sample on a circle in 3D
+        t = t * math.pi * 2.0
+        x = math.cos(t)
+        y = math.sin(t)
+        z = 0.0
+        return vec2(noise([x + self.cx0, y + self.cy0, z + self.cz0]), noise([x + self.cx1, y + self.cy1, z + self.cz1]))
+
 def evaluate_metaballs(balls, x, y):
     sum = 0
     for b in balls:
         dx = x - b.x
         dy = y - b.y
         r2 = dx * dx + dy * dy
-        sum += b.r2 / r2
+        if r2 > 0.0001:
+            sum += b.r2 / r2
+        else:
+            sum += b.r2 / 0.0001
     return sum
 
 def blobs():
-    frames = 10
-    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 100 * 10, 100)
+    radius = g_size * mul * 2
+    next_p2 = next_power_of_2(radius * 2 + 1)
+    width = next_p2
+    w2 = width * 0.5
+    frames = 60
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2 * frames, next_p2)
     data = surf.get_data()
-
-    for f in range(0, 10):
-        balls = []
-        for i in range(0, 10):
-            x = random.uniform(15, 85)
-            y = random.uniform(15, 85)
-            r = random.uniform(5, 10)
-            balls.append(metaball(x, y, r))
+    noise = PerlinNoise(octaves=1, seed=1)
     
-        for y in range(0, 100):
-            for x in range(0, 100):
+    noise_points = []
+    balls = []
+    for f in range(0, 6):
+        noise_points.append(noise_point())
+        balls.append(metaball(0, 0,random.uniform(7, 12)))
+
+    # draw the background hexagons per frame
+    for f in range(0, frames):
+        pos = vec2(w2 + f * next_p2, w2)
+        rounded_hexagon(radius, 3.0 * 2.0 * mul, color(1.0, 1.0, 1.0, 1.0), 0.0, pos, cairo.Context(surf))
+
+
+    for f in range(0, frames):
+        t = f / frames
+        for i in range(0, 6):
+            balls[i].x = noise_points[i].noise(noise, t).x * 60 + w2
+            balls[i].y = noise_points[i].noise(noise, t).y * 60 + w2
+
+        for y in range(0, next_p2):
+            for x in range(0, next_p2):
                 i = x
                 j = y
-                idx = (x + f * 100 + y * 1000) * 4 
+                idx = (x + f * next_p2 + y * next_p2 * frames) * 4 
                 value = evaluate_metaballs(balls, x, y)
-                c = 255
                 if value > 1.0:
                     c = 0
-                data[idx] = c
-                data[idx + 1] = c
-                data[idx + 2] = c
-                data[idx + 3] = 255
+                    data[idx] = c
+                    data[idx + 1] = c
+                    data[idx + 2] = c
+                    data[idx + 3] = 255
 
-    surf.write_to_png("assets/images/generated/blob.png")
+    # manually downsample the image
+    small_surf = cairo.ImageSurface(
+        cairo.FORMAT_ARGB32,
+        (int)(surf.get_width() / 2),
+        (int)(surf.get_height() / 2))
+    
+    # go over each pixel and average the 4 pixels into one
+    for y in range(0, small_surf.get_height()):
+        for x in range(0, small_surf.get_width()):
+            idx = (x * 2 + y * 2 * surf.get_width()) * 4
+            idx0 = idx
+            idx1 = idx + 4
+            idx2 = idx + surf.get_width() * 4
+            idx3 = idx + surf.get_width() * 4 + 4
+            r = (data[idx] + data[idx1] + data[idx2] + data[idx3]) / 4
+            g = (data[idx + 1] + data[idx1 + 1] + data[idx2 + 1] + data[idx3 + 1]) / 4
+            b = (data[idx + 2] + data[idx1 + 2] + data[idx2 + 2] + data[idx3 + 2]) / 4
+            a = (data[idx + 3] + data[idx1 + 3] + data[idx2 + 3] + data[idx3 + 3]) / 4
+            idx = (x + y * small_surf.get_width()) * 4
+            small_surf.get_data()[idx] = (int)(r)
+            small_surf.get_data()[idx + 1] = (int)(g)
+            small_surf.get_data()[idx + 2] = (int)(b)
+            small_surf.get_data()[idx + 3] = (int)(a)
+    
+    small_surf.write_to_png("assets/images/generated/basic.png")
+
+def blobs2():
+    radius = g_size * mul * 2
+    next_p2 = next_power_of_2(radius * 2 + 1)
+    width = next_p2
+    w2 = width * 0.5
+    frames = 60
+    surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, next_p2 * frames, next_p2)
+    data = surf.get_data()
+    noise = PerlinNoise(octaves=1, seed=1)
+    
+    noise_points = []
+    balls = []
+    for f in range(0, 6):
+        noise_points.append(noise_point())
+        balls.append(metaball(0, 0,random.uniform(7, 12)))
+    balls.append(metaball(w2, w2, 12))
+
+    # draw the background hexagons per frame
+    for f in range(0, frames):
+        pos = vec2(w2 + f * next_p2, w2)
+        rounded_hexagon(radius, 3.0 * 2.0 * mul, color(1.0, 1.0, 1.0, 1.0), 0.0, pos, cairo.Context(surf))
+
+    for f in range(0, frames):
+        t = f / frames
+        R = t * 100
+        for i in range(0, 6):
+            a = i * math.pi / 3.0
+            balls[i].x = math.cos(a) * R + w2
+            balls[i].y = math.sin(a) * R + w2
+
+        for y in range(0, next_p2):
+            for x in range(0, next_p2):
+                i = x
+                j = y
+                idx = (x + f * next_p2 + y * next_p2 * frames) * 4 
+                value = evaluate_metaballs(balls, x, y)
+                if value > 1.0:
+                    c = 0
+                    data[idx] = c
+                    data[idx + 1] = c
+                    data[idx + 2] = c
+                    data[idx + 3] = 255
+
+    # manually downsample the image
+    small_surf = cairo.ImageSurface(
+        cairo.FORMAT_ARGB32,
+        (int)(surf.get_width() / 2),
+        (int)(surf.get_height() / 2))
+    
+    # go over each pixel and average the
+    for y in range(0, small_surf.get_height()):
+        for x in range(0, small_surf.get_width()):
+            idx = (x * 2 + y * 2 * surf.get_width()) * 4
+            idx0 = idx
+            idx1 = idx + 4
+            idx2 = idx + surf.get_width() * 4
+            idx3 = idx + surf.get_width() * 4 + 4
+            r = (data[idx] + data[idx1] + data[idx2] + data[idx3]) / 4
+            g = (data[idx + 1] + data[idx1 + 1] + data[idx2 + 1] + data[idx3 + 1]) / 4
+            b = (data[idx + 2] + data[idx1 + 2] + data[idx2 + 2] + data[idx3 + 2]) / 4
+            a = (data[idx + 3] + data[idx1 + 3] + data[idx2 + 3] + data[idx3 + 3]) / 4
+            idx = (x + y * small_surf.get_width()) * 4
+            small_surf.get_data()[idx] = (int)(r)
+            small_surf.get_data()[idx + 1] = (int)(g)
+            small_surf.get_data()[idx + 2] = (int)(b)
+            small_surf.get_data()[idx + 3] = (int)(a)
+
+    small_surf.write_to_png("assets/images/generated/explode.png")
 
 
 def main():
     white = color(1.0, 1.0, 1.0)
     player()
-    basic()
+    # basic()
     stealth()
     ranged()
     explode()
@@ -332,6 +467,7 @@ def main():
     explosion(16 * mul, 16, white, "explosion")
 
 # run the main function
-# main()
+main()
     
 blobs()
+blobs2()
