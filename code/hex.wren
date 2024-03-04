@@ -21,8 +21,9 @@ class HexCoordinate {
     }
 
     construct fromOffset(col, row) {
+        var even = (col % 2) == 0 ? 0 : 1
         _q = col
-        _r = row - (col - (col & 1)) / 2
+        _r = row - (col - even) / 2
     }
 
     q=(value) { _q = value }
