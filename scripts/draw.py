@@ -2,11 +2,11 @@ import math
 import cairo
 from tools import vec2, color
 
-def rounded_hexagon(radius : float, rounding : float, color : color, thickness : float, pos : vec2, context : cairo.Context):
+def rounded_hexagon(radius : float, rounding : float, color : color, thickness : float, pos : vec2, rotation: float, context : cairo.Context):
     if thickness != 0.0 :
         context.set_line_width(thickness)
 
-    t = 0.0
+    t = rotation
     dt = math.pi / 3.0
     dtt = dt * 0.5
     cx = pos.x
@@ -41,8 +41,8 @@ def rounded_rectangle(width: float, height: float, rounding: float, pos : vec2, 
     context.close_path()
     context.fill()
 
-def rounded_triangle(radius, rounding, color, context : cairo.Context):
-    t = 0.0
+def rounded_triangle(radius, rounding, color, rotation: float, context : cairo.Context):
+    t = rotation
     dt = math.pi / 3.0
     dtt = dt * 0.5
     cx = 0.0

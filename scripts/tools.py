@@ -1,4 +1,5 @@
 import math
+import random
 
 class vec2:
     def __init__(self, x:float, y:float) -> None:
@@ -66,4 +67,15 @@ def inv_lerp(a: float, b: float, v: float):
 def remap(a1: float, b1: float, a2: float, b2: float, v: float):
     return lerp(a2, b2, inv_lerp(a1, b1, v))
 
+def hermite(a: float, b: float, c: float, d: float, t: float):
+    tt = t * t
+    ttt = tt * t
+    return (2.0 * ttt - 3.0 * tt + 1.0) * a + (ttt - 2.0 * tt + t) * b + (-2.0 * ttt + 3.0 * tt) * c + (ttt - tt) * d
 
+def smoothstep(a: float, b: float, t: float):
+    t = clamp(0.0, 1.0, inv_lerp(a, b, t))
+    return t * t * (3.0 - 2.0 * t)
+
+def smootherstep(a: float, b: float, t: float):
+    t = clamp(0.0, 1.0, inv_lerp(a, b, t))
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0)

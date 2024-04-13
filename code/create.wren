@@ -146,36 +146,39 @@ class Create {
         var range = en.range
         var s = null        
         var frames = 60
-        var fps = 60
-        var anim = Tools.rangeToList(0..frames-1)
+        var fps = 60        
         if(type == EnemyType.basic) {
-            s = AnimatedSprite.new("[game]/assets/images/generated/basic.png", frames, 1, fps / 2)
+            var anim = Tools.rangeToList(0...60)
+            s = AnimatedSprite.new("[game]/assets/images/generated/basic.png", frames, 1, fps)
             s.addAnimation("idle", anim)
             s.playAnimation("idle")
             s.mul = Data.getColor("Color Enemy Basic")
         } else if(type == EnemyType.range) {
-            s = AnimatedSprite.new("[game]/assets/images/generated/range.png", frames, 1, fps)
+            var anim = Tools.rangeToList(0...60)
+            s = AnimatedSprite.new("[game]/assets/images/generated/range.png", 60, 1, 60)
             s.addAnimation("idle", anim)
             s.playAnimation("idle")
             s.mul = Data.getColor("Color Enemy Range")
         } else if(type == EnemyType.stealth) {
-            s = AnimatedSprite.new("[game]/assets/images/generated/stealth.png", frames, 1, fps / 2)
+            var anim = Tools.rangeToList(0...frames)
+            s = AnimatedSprite.new("[game]/assets/images/generated/stealth.png", frames, 1, fps)
             s.addAnimation("idle", anim)
             s.playAnimation("idle")
             s.mul = Data.getColor("Color Enemy Stealth")
             var st = Stealth.new()
             e.addComponent(st)
         } else if(type == EnemyType.explode) {
+            var anim = Tools.rangeToList(0...frames)
             s = AnimatedSprite.new("[game]/assets/images/generated/explode.png", frames, 1, fps)
             s.addAnimation("explode", anim)
             s.playAnimation("explode")
             s.mul = Data.getColor("Color Enemy Explode")            
         } else if(type == EnemyType.split) {
+            var anim = Tools.rangeToList(0...frames)
             s = AnimatedSprite.new("[game]/assets/images/generated/basic.png", frames, 1, fps)
             s.mul = Data.getColor("Color Enemy Split")
         }
 
-        // s.randomizeFrame(__random)
         s.flags = Render.spriteCenter
         e.addComponent(t)
         e.addComponent(h)        
@@ -266,31 +269,6 @@ class Create {
         var w = Data.getNumber("Width", Data.system) / 2
         var h = Data.getNumber("Height", Data.system) / 2
 
-        /*
-
-        { // Background
-            var e = Entity.new()
-            var t = Transform.new(Vec2.new(0, 0))
-            var s = Sprite.new("[game]/assets/images/generated/white.png")
-            s.layer = -1.1
-            s.scale = 320
-            s.flags = Render.spriteCenter
-            s.mul = Data.getColor("Color Background")
-            e.addComponent(t)
-            e.addComponent(s)
-        }        
-
-        { // Vignete
-            var e = Entity.new()
-            var t = Transform.new(Vec2.new(0, 0))
-            var s = Sprite.new("[game]/assets/images/generated/vignete.png")
-            s.layer = 1.0
-            s.scale = 2
-            s.flags = Render.spriteCenter
-            e.addComponent(t)
-            e.addComponent(s)
-        }
-        */
         {   // Bottom label
             var e = Entity.new()
             var t = Transform.new(Vec2.new(700, -h + 16))
@@ -301,6 +279,25 @@ class Create {
             e.addComponent(t)
             e.addComponent(l)
         }
+
+        // Draw a stack of levels (25 in total)
+        var y = -h + 280
+        var x = w - 170
+        for(i in 0..25) {
+            var e = Entity.new()
+            var t = Transform.new(Vec2.new(x, y))
+            var s = Sprite.new("[game]/assets/images/generated/level.png")
+            s.layer = 0.0
+            s.flags = Render.spriteCenter
+            if(i <= Gameplay.level) {
+                s.mul = Data.getColor("Color Player")
+            } else {
+                s.mul = Data.getColor("Color UI")
+            }
+            e.addComponent(t)
+            e.addComponent(s)
+            y = y + 20
+        } 
     }
 
     static mainMenu() {
