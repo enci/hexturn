@@ -5,7 +5,7 @@
     },
     "Color Background": {
         "type": "color",
-        "value": 538253311
+        "value": 4294967295
     },
     "Color Enemy": {
         "type": "color",
@@ -29,15 +29,15 @@
     },
     "Color Inactive Tile": {
         "type": "color",
-        "value": 252656383
+        "value": 3941264127
     },
     "Color Obstacle": {
         "type": "color",
-        "value": 1042957823
+        "value": 3941264127
     },
     "Color Player": {
         "type": "color",
-        "value": 298713087
+        "value": 1828754431
     },
     "Color Player Far": {
         "type": "color",

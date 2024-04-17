@@ -2,6 +2,7 @@ import "xs" for Input, Render, Data, File, Audio
 import "xs_ec"for Entity, Component
 import "xs_math"for Math, Bits, Vec2
 import "xs_components" for Transform, Body, Renderable, Sprite, GridSprite, AnimatedSprite, Relation, Label
+import "xs_shapes" for Shapes, Shape, ShapeRenderer
 import "xs_tools" for Tools
 import "random" for Random
 
@@ -43,13 +44,20 @@ class Create {
         var e = Entity.new()
         var t = Transform.new(grid.getPosition(hex))
         var h = HexTileComponent.new(hex, grid)
-        var s = Sprite.new("[game]/assets/images/generated/filled_hexagon.png")
-        s.layer = 1
-        s.flags = Render.spriteCenter
-        s.mul = Data.getColor("Color Obstacle")
+        var points = Shapes.polygon(Vec2.new(0, 0), 40, 6, 10, 6)
+        var shape = Shapes.fill(points, 0xFFFFFFFF)
+        var mr = ShapeRenderer.new(shape)
+        mr.addColor = 0x00000000
+        mr.mulColor = Data.getColor("Color Obstacle")
+        e.addComponent(mr)
+
+        // var s = Sprite.new("[game]/assets/images/generated/filled_hexagon.png")
+        // s.layer = 1
+        // s.flags = Render.spriteCenter
+        // s.mul = Data.getColor("Color Obstacle")
         e.addComponent(t)
         e.addComponent(h)
-        e.addComponent(s)
+        // e.addComponent(s)
         e.tag = Tag.obstacle
         return e
     }
@@ -69,17 +77,26 @@ class Create {
         var gs = Gameplay.grid.gridSize
         var h = HexTileComponent.new(HexCoordinate.new(0, gs-1), Gameplay.grid)
         var p = Player.new()
-        var s = AnimatedSprite.new("[game]/assets/images/generated/player.png", 60, 1, 60)
-        var anim = Tools.rangeToList(0..59) + Tools.rangeToList(59..0)
-        s.addAnimation("idle", anim)
-        s.playAnimation("idle")
-        s.layer = 1
-        s.flags = Render.spriteCenter
-        s.mul = Data.getColor("Color Player")
+        
+        //var s = AnimatedSprite.new("[game]/assets/images/generated/player.png", 60, 1, 60)
+        //var anim = Tools.rangeToList(0..59) + Tools.rangeToList(59..0)
+        //s.addAnimation("idle", anim)
+        //s.playAnimation("idle")
+        //s.layer = 1
+        //s.flags = Render.spriteCenter
+        //s.mul = Data.getColor("Color Player")
+
+        // Init hex shape / shape renderer
+        var points = Shapes.polygon(Vec2.new(0, 0), 40, 6, 15, 6)
+        var shape = Shapes.fill(points, 0xFFFFFFFF)
+        var mr = ShapeRenderer.new(shape)
+        mr.addColor = 0x00000000
+        mr.mulColor = Data.getColor("Color Player")
+        e.addComponent(mr)
         e.addComponent(t)
         e.addComponent(h)
         e.addComponent(p)
-        e.addComponent(s)
+        // e.addComponent(s)
         e.tag = Tag.player
         return e
     }
