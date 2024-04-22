@@ -5,18 +5,20 @@ import "xs_components" for Renderable
 import "xs_shapes" for Shapes, Shape, ShapeRenderer
 import "random" for Random
 
-/*
 class Game {
 
-    static init() {
-        Entity.init()
-        var size = 100
+    static init() {    
+        // Entity.init()
+        var w = 1920 / 2
+        var h = 1080 / 2        
         __shape = Shapes.quad(
-            Vec2.new(0, 0),
-            Vec2.new(size, 0),
-            Vec2.new(size, size),
-            Vec2.new(0, size),
+            Vec2.new(-w, -h),
+            Vec2.new(w, -h),
+            Vec2.new(w, h),
+            Vec2.new(-w, h),            
             0xFFFFFFFF)
+
+        HexCoordinate.orientation = HexCoordinate.pointyTop
     }
 
     static config() { }
@@ -26,10 +28,31 @@ class Game {
 
     static render() {
         __shape.render(Vec2.new(0, 0), 1.5, 0.0)
+
+        /*
+        Render.setColor(0xFF0000FF)
+        Render.circle(0, 0, 100, 6)
+        */
+
+        var hexSize = 50
+        var origin = HexCoordinate.new(0, 0)
+        for (x in -9..9) {
+            for(y in -5..5) {
+                var hex = HexCoordinate.fromOffset(x, y)
+                var pos = hex.toPoint(hexSize)
+                if(HexCoordinate.distance(hex, origin) < 5) {
+                    Render.setColor(0x00FF00FF)
+                    Render.circle(pos.x, pos.y, hexSize - 5, 16)
+                } else {
+                    Render.setColor(0xFF0000FF)
+                    Render.circle(pos.x, pos.y, hexSize - 5, 16)                    
+                }
+            }
+        }        
     }
 }
-*/
 
+/*
 
 class GameState {
     static menu     { 0 }
@@ -222,7 +245,10 @@ class Game {
     static version { "0.0.5" }
 }
 
+
 import "code/create" for Create
 import "code/gameplay" for Gameplay
+*/
+
 import "code/data" for Grid
-import "code/hex" for HexCoordinate, HexGrid, HexTileComponent
+import "code/xs_hex" for HexCoordinate /*, HexGrid, HexTileComponent*/
