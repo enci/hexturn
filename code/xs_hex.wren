@@ -26,7 +26,7 @@ class HexCoordinate {
         _r = hex.r
     }
 
-    construct fromOffset(col, row) {
+    setOffset(col, row) {
         if(HexCoordinate.orientation == HexCoordinate.flatTop) {
             _q = col
             _r = row - (col + (col & 1)) / 2
@@ -34,9 +34,6 @@ class HexCoordinate {
             _q = col - (row + (row & 1)) / 2
             _r = row
         }
-        //var even = (col % 2) == 0 ? 0 : 1
-        //_q = col
-        //_r = row - (col - even) / 2
     }
 
     q=(value) { _q = value }

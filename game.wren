@@ -19,6 +19,10 @@ class Game {
             0xFFFFFFFF)
 
         HexCoordinate.orientation = HexCoordinate.pointyTop
+
+        __hexSize = 72
+        var hexPoints = Shapes.polygon(Vec2.new(0,0), __hexSize * 0.96, 6, 10, 2)
+        __hexOutline = Shapes.stroke(hexPoints, 1, 0xFFFFFFFF)
     }
 
     static config() { }
@@ -27,28 +31,37 @@ class Game {
     }
 
     static render() {
-        __shape.render(Vec2.new(0, 0), 1.5, 0.0)
+        __shape.render(Vec2.new(0, 0), 1.0, 0.0)
+
+        var rot = 30.0 * Math.pi / 180.0
+        var origin = HexCoordinate.new(0, 0)
+        var hex = HexCoordinate.new(0, 0)
+        var range = 4
+        for(q in -range..range) {
+            for(r in Math.max(-range, -q-range)..Math.min(range, -q+range)) {
+                hex.q = q
+                hex.r = r
+                var pos = hex.toPoint(__hexSize)
+                __hexOutline.render(pos, 1.0, rot, 0x000000FF, 0x00000000)
+            }
+        }
+
 
         /*
-        Render.setColor(0xFF0000FF)
-        Render.circle(0, 0, 100, 6)
-        */
-
-        var hexSize = 50
-        var origin = HexCoordinate.new(0, 0)
         for (x in -9..9) {
             for(y in -5..5) {
-                var hex = HexCoordinate.fromOffset(x, y)
-                var pos = hex.toPoint(hexSize)
+                hex.setOffset(x, y)
+                var pos = hex.toPoint(__hexSize)
+                /*
                 if(HexCoordinate.distance(hex, origin) < 5) {
-                    Render.setColor(0x00FF00FF)
-                    Render.circle(pos.x, pos.y, hexSize - 5, 16)
+                    //__hexOutline.render(pos, 1.0, rot, 0x00000000, 0xFF0000FF)
                 } else {
-                    Render.setColor(0xFF0000FF)
-                    Render.circle(pos.x, pos.y, hexSize - 5, 16)                    
+                    // __hexOutline.render(pos, 1.0, rot, 0x00000000, 0xFF0000FF)
                 }
-            }
-        }        
+                */
+            }            
+        } 
+        */       
     }
 }
 
