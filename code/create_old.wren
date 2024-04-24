@@ -19,7 +19,6 @@ class Create {
             */
     }
 
-    /*
     static obstacles() {
         var grid = Gameplay.grid                
         var hexes = grid.getFreeHexesInRange(HexCoordinate.new(0, 0), 2)
@@ -71,15 +70,12 @@ class Create {
         }
         return hex
     }
-    */
 
     static player() {        
         var e = Entity.new()
         var t = Transform.new(Vec2.new(0, 0))
-        t.rotation = Math.pi / 6
-        //var gs = Gameplay.grid.gridSize
-        //var h = HexTileComponent.new(HexCoordinate.new(0, gs-1), Gameplay.grid)
-        var h = HexComponent.new(HexCoordinate.new(0, 0), Gameplay.grid)
+        var gs = Gameplay.grid.gridSize
+        var h = HexTileComponent.new(HexCoordinate.new(0, gs-1), Gameplay.grid)
         var p = Player.new()
         
         //var s = AnimatedSprite.new("[game]/assets/images/generated/player.png", 60, 1, 60)
@@ -90,25 +86,21 @@ class Create {
         //s.flags = Render.spriteCenter
         //s.mul = Data.getColor("Color Player")
 
-
         // Init hex shape / shape renderer
         var points = Shapes.polygon(Vec2.new(0, 0), 40, 6, 15, 6)
         var shape = Shapes.fill(points, 0xFFFFFFFF)
-
         var mr = ShapeRenderer.new(shape)
         mr.addColor = 0x00000000
         mr.mulColor = Data.getColor("Color Player")
-
         e.addComponent(mr)
         e.addComponent(t)
         e.addComponent(h)
         e.addComponent(p)
-        
-        e.tag = Tag.player        
+        // e.addComponent(s)
+        e.tag = Tag.player
         return e
     }
 
-    /*
     static enemies(amount) {   
         System.print("Creating " + amount.toString + " enemies")    
         var playerHex = HexCoordinate.new(0, 3) 
@@ -351,14 +343,12 @@ class Create {
         e.addComponent(l)
         return e
     }
-
-    */
 }
 
 import "game" for Game
 import "code/tags" for Tag
-import "code/xs_hex" for HexCoordinate, HexComponent
-//import "code/ui" for ImGui, MainMenu, PingLabel
+import "code/hex" for HexCoordinate, HexTileComponent
+import "code/ui" for ImGui, MainMenu, PingLabel
 import "code/gameplay" for Gameplay
 import "code/player" for Player
-//import "code/enemy" for Enemy, EnemyType, Stealth
+import "code/enemy" for Enemy, EnemyType, Stealth

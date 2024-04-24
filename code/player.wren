@@ -10,7 +10,7 @@ class Player is Component {
 
     construct new() {
         _canMove = false       
-        resetRange()
+        // resetRange()
         _moveDir = Vec2.new(0.0, 0.0)
         _moveHex = null
         _deadzone = 0.4
@@ -18,9 +18,11 @@ class Player is Component {
     }
 
     initialize() {
-        _transform = owner.getComponent(Transform)
-        _hexTile = owner.getComponent(HexTileComponent)
 
+        _transform = owner.getComponent(Transform)
+        _hexComp = owner.getComponent(HexComponent)
+
+        /*
         var rangeImg = Render.loadImage("[game]/assets/images/generated/small_hexagon.png")
         _rangeSprite = Render.createSprite(rangeImg, 0, 0, 1, 1)
 
@@ -33,24 +35,51 @@ class Player is Component {
         if(Gameplay.level >= Data.getNumber("Level Extra Range")) {
             __passivePowerUp = PowerUps.range
         }
-        resetRange()
 
-        System.print("Player initialized with transform " + _transform.toString + " and hexTile " + _hexTile.toString)
+        resetRange()
+        */
+
+
+        System.print("Player initialized with transform " + _transform.toString + " and hexTile " + _hexComp.toString)
     }
 
-    update(dt) { }
+    update(dt) {
+        _moveDir = Vec2.new(Input.getAxis(0), Input.getAxis(1))
+        _moveHex = null
+
+        // Controller input
+        if(_canMove && _moveDir.magnitude > _deadzone) {
+            var angle = -_moveDir.atan2 + Num.pi / 6.0
+            var angleHex = (angle) / (Num.pi * 2.0) * 6.0
+            angleHex = angleHex.round
+                        
+            if(_moveDir.magnitude > 0.85 /* && _hexTile.canMove(angleHex, tag) */) {
+                var tile = _hexComp.move(angleHex)
+                //tileStep(tile)
+            }            
+        } else {
+            if(_moveDir.magnitude < _deadzone * 0.5) {
+                _canMove = true
+            }
+        }
+
+        return _range == 0
+    }
 
     turn() {
+
         if(!initialized_) {
             return false
         }
 
+        /*
         if(_range == 0) {
             return true
         }
 
         _moveDir = Vec2.new(Input.getAxis(0), Input.getAxis(1))
         _moveHex = null
+
 
         // Mouse input
         var tag = Tag.enemy | Tag.powerUp // | 
@@ -89,8 +118,10 @@ class Player is Component {
         }
 
         return _range == 0
+        */
     }
 
+    /*
     tileStep(tile) {
         if(tile != null) {
             if(tile.owner.tag == Tag.enemy) {
@@ -163,13 +194,16 @@ class Player is Component {
                 Render.sprite(sprite, pos.x, pos.y, 1.1, 1.0, 0.0, color, 0x0, Render.spriteCenter)
         }
     }
+    */
 }
 
-import "game" for Game, GameState
+// import "game" for Game, GameState
 import "code/tags" for Tag, PowerUps
 import "code/data" for Grid, Queue
-import "code/hex" for HexCoordinate, HexGrid, HexTileComponent
+
+import "code/xs_hex" for HexCoordinate, HexComponent, HexagonalGrid
+
 import "code/create" for Create
-import "code/ui" for UI
-import "code/gameplay" for Gameplay
-import "code/enemy" for Enemy
+// import "code/ui" for UI
+// import "code/gameplay" for Gameplay
+// import "code/enemy" for Enemy

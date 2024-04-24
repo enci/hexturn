@@ -22,14 +22,10 @@ class Gameplay {
         __hexSize = 66
         __gridSize = 4
         __state = State.none      
-        __nextState = State.none
-        // Player.initialize()
-
-        start()
+        __nextState = State.none  
+        Player.initialize()
     }
 
-    
-    /*
     static reset() {
         System.print("Gameplay reset")
         if(__state == State.none) {
@@ -45,30 +41,26 @@ class Gameplay {
         }        
         UI.shutdown()
     }
-    */
 
     static start() {
         System.print("Gameplay start")
         if(__level >= Data.getNumber("Level Enlarge Grid")) {
             __gridSize = 5
         }
-        __gameGrid = HexagonalGrid.new(__hexSize, __gridSize)
-        __distGrid = HexagonalGrid.new(__hexSize, __gridSize)        
-        __bestDirection = HexagonalGrid.new(__hexSize, __gridSize)
+        __gameGrid = HexGrid.new(__hexSize, __gridSize)
+        __distGrid = HexGrid.new(__hexSize, __gridSize)        
+        __bestDirection = HexGrid.new(__hexSize, __gridSize)
         __dangerTiles = Map.new()
-        
-        /*
+
         __triangle = GridSprite.new("[game]/assets/images/generated/triangle.png", 6, 1)
         __player = Create.player() 
         System.print("Player created" + __player.toString)       
         __obstacles = Create.obstacles()
         __enemies = Create.enemies(__level + 4)
         __state = State.player
-        */
-        //UI.init()    
+        UI.init()
     }
 
-    /*
     static nextLevel() {
         __level = __level + 1
         __score = __score + 1
@@ -218,7 +210,7 @@ class Gameplay {
         return best
     }
 
-    static render() 
+    static render() {       
         var dangerColor = Data.getColor("Color Enemy")        
         var normalColor = Data.getColor("Color Active Tile")                
         var n = __gameGrid.gridSize - 1
@@ -265,7 +257,6 @@ class Gameplay {
     static cleanUp() {
         __gameGrid.cleanUp()
     }
-    */
 
     static grid { __gameGrid }
     static distGrid {  __distGrid }
@@ -277,12 +268,12 @@ class Gameplay {
     static hexSize { __hexSize }
 }
 
-import "game" for Game /*, GameState*/
+import "game" for Game, GameState
 import "code/data" for Grid, Queue
-import "code/xs_hex" for HexCoordinate, HexComponent, HexagonalGrid
+import "code/hex" for HexCoordinate, HexGrid, HexTileComponent
 import "code/tags" for Tag
 import "code/create" for Create
-//import "code/ui" for UI
+import "code/ui" for UI
 import "code/player" for Player
-// import "code/enemy" for Enemy, EnemyType, Stealth
+import "code/enemy" for Enemy, EnemyType, Stealth
 

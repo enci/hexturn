@@ -2,13 +2,15 @@ import "xs" for Input, Render, Data
 import "xs_math" for Vec2, Math
 import "xs_ec"for Entity, Component
 import "xs_components" for Renderable
-import "xs_shapes" for Shapes, Shape, ShapeRenderer
+import "xs_shapes" for Shapes, Shape, ShapeRenderer, Font, FontRenderer
 import "random" for Random
 
 class Game {
 
     static init() {    
-        // Entity.init()
+        Entity.init()
+        Gameplay.init()
+
         var w = 1920 / 2
         var h = 1080 / 2        
         __shape = Shapes.quad(
@@ -16,22 +18,28 @@ class Game {
             Vec2.new(w, -h),
             Vec2.new(w, h),
             Vec2.new(-w, h),            
-            0xFFFFFFFF)
+            0x2F2F2FFF)
 
         HexCoordinate.orientation = HexCoordinate.pointyTop
 
         __hexSize = 72
         var hexPoints = Shapes.polygon(Vec2.new(0,0), __hexSize * 0.96, 6, 10, 2)
         __hexOutline = Shapes.stroke(hexPoints, 1, 0xFFFFFFFF)
+
+        __font = Font.load("[game]/assets/fonts/Miracode.txt")
+
+
+        __player = Create.player()
     }
 
     static config() { }
     
     static update(dt) {
+        Entity.update(dt)        
     }
 
     static render() {
-        __shape.render(Vec2.new(0, 0), 1.0, 0.0)
+        __shape.render(Vec2.new(0, 0), 1.0, 0.0)                        
 
         var rot = 30.0 * Math.pi / 180.0
         var origin = HexCoordinate.new(0, 0)
@@ -41,12 +49,21 @@ class Game {
             for(r in Math.max(-range, -q-range)..Math.min(range, -q+range)) {
                 hex.q = q
                 hex.r = r
-                var pos = hex.toPoint(__hexSize)
+                var pos = hex.getPosition(__hexSize)
                 __hexOutline.render(pos, 1.0, rot, 0x000000FF, 0x00000000)
             }
         }
 
+        //Shapes.renderText("Hello World", __font, Vec2.new(0, 0), 1.0, 0.0, 0xFFFFFFFF, 0x00000000)
 
+        var player = __player.getComponent(Player)
+        
+
+
+        Shapes.renderText("Hello World asdf asd flkjahsdfkljh lkajhsdlkfjhasldkj asdlfkjhasdlkjh ", __font, Vec2.new(100, 100), 20.0)
+
+        Shapes.render()
+        
         /*
         for (x in -9..9) {
             for(y in -5..5) {
@@ -63,6 +80,8 @@ class Game {
         } 
         */       
     }
+
+    font { __font }
 }
 
 /*
@@ -257,11 +276,9 @@ class Game {
 
     static version { "0.0.5" }
 }
-
-
-import "code/create" for Create
-import "code/gameplay" for Gameplay
 */
 
+import "code/gameplay" for Gameplay
+import "code/create" for Create
 import "code/data" for Grid
 import "code/xs_hex" for HexCoordinate /*, HexGrid, HexTileComponent*/
