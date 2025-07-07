@@ -1,0 +1,22 @@
+{
+    "Height": {
+        "type": "number",
+        "value": 0.0
+    },
+    "MSAA": {
+        "type": "bool",
+        "value": false
+    },
+    "Multiplier": {
+        "type": "number",
+        "value": 0.0
+    },
+    "Title": {
+        "type": "string",
+        "value": ""
+    },
+    "Width": {
+        "type": "number",
+        "value": 0.0
+    }
+}
